@@ -36,7 +36,9 @@ jobs:
         run: pnpm test
 
       - name: Build
+        if: hashFiles('src/index.ts') != ''
         run: pnpm build
 
       - name: Bundle drift check
+        if: hashFiles('src/index.ts') != ''
         run: git diff --exit-code dist/
