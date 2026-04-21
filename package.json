@@ -1,0 +1,30 @@
+{
+  "name": "autoresolve-pr-threads",
+  "version": "0.1.0",
+  "description": "GitHub Action: auto-resolve addressed bot PR review threads via deterministic gates + Claude Haiku",
+  "type": "module",
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "build": "ncc build src/index.ts -o dist --minify",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check",
+    "format": "biome check --write",
+    "check": "pnpm lint && pnpm typecheck && pnpm test"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^6.0.0",
+    "@anthropic-ai/sdk": "^0.90.0",
+    "minimatch": "^10.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^20.17.0",
+    "@vercel/ncc": "^0.38.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}
