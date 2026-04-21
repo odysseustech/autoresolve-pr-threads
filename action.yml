@@ -34,6 +34,10 @@ inputs:
     description: "Comma-separated globs for generated files (auto-resolved without AI)."
     required: false
     default: "**/generated/**,**/*.generated.*,**/dist/**,**/build/**,**/package-lock.json,**/pnpm-lock.yaml,**/bun.lockb,**/yarn.lock,**/prisma/migrations/**"
+  pr-number:
+    description: "PR number to process. Required when triggered via workflow_dispatch."
+    required: false
+    default: ""
 
 outputs:
   resolved-count:

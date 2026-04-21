@@ -15,25 +15,51 @@ async function run(): Promise<void> {
     core.warning(`Unsupported event: ${ctx.eventName}. Exiting.`);
     return;
   }
-  const prPayload = ctx.payload.pull_request;
-  if (!prPayload) {
-    core.warning("No pull_request in payload. Exiting.");
-    return;
-  }
-  // Fork PRs: skip for safety — crafted bot comments could manipulate the classifier.
-  if (prPayload.head.repo.full_name !== prPayload.base.repo.full_name) {
-    core.info("Fork PR detected; skipping for safety.");
-    return;
-  }
-
-  const pr = {
-    owner: ctx.repo.owner,
-    repo: ctx.repo.repo,
-    number: prPayload.number as number,
-    headSha: prPayload.head.sha as string,
-  };
 
   const gh = createGitHubClient(cfg.githubToken);
+
+  let pr: { owner: string; repo: string; number: number; headSha: string };
+
+  if (ctx.eventName === "workflow_dispatch") {
+    const prNumberStr = core.getInput("pr-number");
+    if (!prNumberStr) {
+      core.setFailed("workflow_dispatch requires the pr-number input.");
+      return;
+    }
+    const prNumber = Number.parseInt(prNumberStr, 10);
+    if (Number.isNaN(prNumber)) {
+      core.setFailed(`pr-number must be an integer, got: ${prNumberStr}`);
+      return;
+    }
+    const prData = await gh.getPullRequest(ctx.repo.owner, ctx.repo.repo, prNumber);
+    if (prData.headRepoFullName !== prData.baseRepoFullName) {
+      core.info("Fork PR detected; skipping for safety.");
+      return;
+    }
+    pr = {
+      owner: ctx.repo.owner,
+      repo: ctx.repo.repo,
+      number: prData.number,
+      headSha: prData.headSha,
+    };
+  } else {
+    const prPayload = ctx.payload.pull_request;
+    if (!prPayload) {
+      core.warning("No pull_request in payload. Exiting.");
+      return;
+    }
+    // Fork PRs: skip for safety — crafted bot comments could manipulate the classifier.
+    if (prPayload.head.repo.full_name !== prPayload.base.repo.full_name) {
+      core.info("Fork PR detected; skipping for safety.");
+      return;
+    }
+    pr = {
+      owner: ctx.repo.owner,
+      repo: ctx.repo.repo,
+      number: prPayload.number as number,
+      headSha: prPayload.head.sha as string,
+    };
+  }
   const git = createGit();
   const classify = createClassifier(cfg.anthropicApiKey, cfg.model);
 

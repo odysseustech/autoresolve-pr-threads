@@ -72,5 +72,24 @@ export function createGitHubClient(token: string) {
     async resolveReviewThread(threadId: string): Promise<void> {
       await octokit.graphql(RESOLVE_MUTATION, { threadId });
     },
+
+    async getPullRequest(
+      owner: string,
+      repo: string,
+      pullNumber: number,
+    ): Promise<{
+      number: number;
+      headSha: string;
+      headRepoFullName: string;
+      baseRepoFullName: string;
+    }> {
+      const { data } = await octokit.rest.pulls.get({ owner, repo, pull_number: pullNumber });
+      return {
+        number: data.number,
+        headSha: data.head.sha,
+        headRepoFullName: data.head.repo?.full_name ?? "",
+        baseRepoFullName: data.base.repo.full_name,
+      };
+    },
   };
 }
