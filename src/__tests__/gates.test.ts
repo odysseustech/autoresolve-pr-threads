@@ -60,6 +60,13 @@ describe("gates", () => {
     });
   });
 
+  it("skips threads with no comments via gateNonBotAuthor", async () => {
+    expect(await runGates(mkThread({ comments: [] }), ctx)).toEqual({
+      kind: "skip",
+      reason: "no-line-anchor",
+    });
+  });
+
   it("skips non-bot authors", async () => {
     const t = mkThread();
     const [c] = t.comments;

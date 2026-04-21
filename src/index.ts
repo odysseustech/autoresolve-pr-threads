@@ -5,7 +5,7 @@ import { loadConfig } from "./config.js";
 import { runGates } from "./gates.js";
 import { createGit } from "./git.js";
 import { createGitHubClient } from "./github.js";
-import type { ThreadDecision } from "./types.js";
+import type { PullRequestContext, ThreadDecision } from "./types.js";
 
 async function run(): Promise<void> {
   const cfg = loadConfig();
@@ -18,7 +18,7 @@ async function run(): Promise<void> {
 
   const gh = createGitHubClient(cfg.githubToken);
 
-  let pr: { owner: string; repo: string; number: number; headSha: string };
+  let pr: PullRequestContext;
 
   if (ctx.eventName === "workflow_dispatch") {
     const prNumberStr = core.getInput("pr-number");
