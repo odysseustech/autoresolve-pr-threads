@@ -1,0 +1,52 @@
+name: "Auto-Resolve Bot Review Threads"
+description: "Resolves addressed bot review comments on PRs using a deterministic gate chain and Claude Haiku."
+author: "odysseustech"
+
+branding:
+  icon: "check-circle"
+  color: "purple"
+
+inputs:
+  anthropic-api-key:
+    description: "Anthropic API key for the Haiku classifier."
+    required: true
+  github-token:
+    description: "Token with pull-requests:write and contents:read."
+    required: false
+    default: ${{ github.token }}
+  dry-run:
+    description: "If true, log decisions but do not resolve threads."
+    required: false
+    default: "false"
+  bot-logins:
+    description: "Comma-separated allowlist of bot login names (without [bot] suffix is also accepted)."
+    required: false
+    default: "coderabbitai[bot],greptile-apps[bot],copilot-pull-request-reviewer[bot],cursor[bot]"
+  model:
+    description: "Anthropic model id."
+    required: false
+    default: "claude-haiku-4-5-20251001"
+  max-resolutions-per-run:
+    description: "Hard cap on auto-resolutions in a single run."
+    required: false
+    default: "20"
+  generated-file-globs:
+    description: "Comma-separated globs for generated files (auto-resolved without AI)."
+    required: false
+    default: "**/generated/**,**/*.generated.*,**/dist/**,**/build/**,**/package-lock.json,**/pnpm-lock.yaml,**/bun.lockb,**/yarn.lock,**/prisma/migrations/**"
+  pr-number:
+    description: "PR number to process. Required when triggered via workflow_dispatch."
+    required: false
+    default: ""
+
+outputs:
+  resolved-count:
+    description: "Number of threads resolved this run."
+  skipped-count:
+    description: "Number of threads skipped."
+  classified-count:
+    description: "Number of threads that reached the AI classifier."
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
