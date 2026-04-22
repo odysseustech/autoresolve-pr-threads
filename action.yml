@@ -17,7 +17,7 @@ inputs:
   dry-run:
     description: "If true, log decisions but do not resolve threads."
     required: false
-    default: "true"
+    default: "false"
   bot-logins:
     description: "Comma-separated allowlist of bot login names (without [bot] suffix is also accepted)."
     required: false
